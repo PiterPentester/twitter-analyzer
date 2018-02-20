@@ -1,0 +1,76 @@
+buildscript {
+	ext {
+		// springBootVersion = '1.5.10.RELEASE'
+		springBootVersion = '2.0.0.RC1'
+		aptPluginVersion = '0.14'
+	}
+	repositories {
+		mavenCentral()
+		maven { url "https://repo.spring.io/snapshot" }
+		maven { url "https://repo.spring.io/milestone" }
+		maven { url "https://plugins.gradle.org/m2/" }
+	}
+	dependencies {
+		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+		classpath("net.ltgt.gradle:gradle-apt-plugin:${aptPluginVersion}")
+	}
+}
+
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'org.springframework.boot'
+apply plugin: 'io.spring.dependency-management'
+apply plugin: 'net.ltgt.apt'
+apply plugin: 'net.ltgt.apt-idea'
+
+group = 'io.github.gandrade.analyzer'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = 1.8
+
+repositories {
+	mavenCentral()
+	maven { url "https://repo.spring.io/snapshot" }
+	maven { url "https://repo.spring.io/milestone" }
+}
+
+ext {
+	mapStructVersion = '1.2.0.Final'
+	neo4jOgmVersion = '3.0.0'
+}
+
+compileJava {
+	options.compilerArgs = [
+			'-Amapstruct.defaultComponentModel=spring',
+			'-Amapstruct.unmappedTargetPolicy=IGNORE'
+	]
+}
+
+dependencies {
+	// Not supported when using Spring Boot 2
+	// compile("org.springframework.boot:spring-boot-starter-social-twitter")
+
+	// Neo4j dependencies
+	compile("org.springframework.boot:spring-boot-starter-data-neo4j")
+	// compile("org.neo4j:neo4j-ogm-http-driver:${neo4jOgmVersion}")
+	compile("org.neo4j:neo4j-ogm-bolt-driver:${neo4jOgmVersion}")
+
+	compile("org.springframework.boot:spring-boot-starter-batch")
+	runtime('mysql:mysql-connector-java') // Needs to have a database in place
+
+	compile("org.springframework.boot:spring-boot-starter-integration")
+	compile("org.springframework.integration:spring-integration-twitter")
+
+	// MapStruct configuration
+	compile("org.mapstruct:mapstruct-jdk8:${mapStructVersion}")
+	annotationProcessor("org.mapstruct:mapstruct-processor:${mapStructVersion}")
+
+	// Lombok configuration
+	compileOnly("org.projectlombok:lombok")
+	annotationProcessor("org.projectlombok:lombok")
+
+	testCompile("org.springframework.boot:spring-boot-starter-test")
+	testCompile("org.springframework.batch:spring-batch-test")
+}
+
+
+
