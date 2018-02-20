@@ -9,4 +9,4 @@ before_script:
   - export PATH=$PATH:$HOME/bin
 
 install:
-  - ./twitter-service/gradlew clean install
+  - sh ./twitter-service/gradlew clean install
