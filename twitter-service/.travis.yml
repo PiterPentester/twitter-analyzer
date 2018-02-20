@@ -4,9 +4,10 @@ sudo: required
 
 jdk:
   - oraclejdk8
+  - oraclejdk9
 
 before_script:
   - export PATH=$PATH:$HOME/bin
 
 install:
-  - sh ./twitter-service/gradlew --build-file twitter-service/build.gradle clean build 
+  - sh ./twitter-service/gradlew clean build 
