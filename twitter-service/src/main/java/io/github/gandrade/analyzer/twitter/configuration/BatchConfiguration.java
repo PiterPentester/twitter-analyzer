@@ -6,26 +6,14 @@ import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
-import org.springframework.batch.core.job.builder.FlowBuilder;
-import org.springframework.batch.core.job.builder.FlowJobBuilder;
-import org.springframework.batch.core.job.flow.Flow;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
-import org.springframework.batch.core.step.tasklet.TaskletStep;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.support.IteratorItemReader;
-import org.springframework.batch.item.support.ListItemReader;
-import org.springframework.batch.repeat.RepeatCallback;
-import org.springframework.batch.repeat.RepeatException;
-import org.springframework.batch.repeat.RepeatOperations;
-import org.springframework.batch.repeat.RepeatStatus;
-import org.springframework.batch.repeat.support.RepeatTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.social.twitter.api.CursoredList;
-import org.springframework.social.twitter.api.Twitter;
 import org.springframework.social.twitter.api.TwitterProfile;
 import org.springframework.social.twitter.api.impl.TwitterTemplate;
 
@@ -51,7 +39,7 @@ public class BatchConfiguration {
     @Bean
     public ItemReader<TwitterProfile> twitterFollowersReader() {
         CursoredList<TwitterProfile> followers = twitterTemplate.friendOperations().getFollowers();
-        return new TwitterReader<>(followers);
+        return new TwitterFollowersReader<>(followers);
 //        return new IteratorItemReader<>(twitterTemplate
 //                .friendOperations()
 //                .getFollowers()
