@@ -15,8 +15,7 @@ public class TwitterProfileProcessor implements ItemProcessor<TwitterProfile, Pr
 
     @Override
     public Profile process(TwitterProfile item) {
-        Profile profile = twitterProfileMapper.twitterProfileToProfile(item);
-        log.info(String.format("Handling profile %s", profile.toString()));
-        return profile;
+        log.info("Handling Twitter profile {}", item.toString());
+        return twitterProfileMapper.twitterProfileToProfile(item);
     }
 }

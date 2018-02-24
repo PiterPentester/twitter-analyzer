@@ -5,32 +5,34 @@ import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.NonTransientResourceException;
 import org.springframework.batch.item.ParseException;
 import org.springframework.batch.item.UnexpectedInputException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.social.twitter.api.CursoredList;
 import org.springframework.social.twitter.api.impl.TwitterTemplate;
 
 @Slf4j
-public class TwitterReader<T> implements ItemReader<T> {
+public class TwitterFollowersReader<T> implements ItemReader<T> {
 
-    private CursoredList<T> iterator;
-    private int currentPosition = 0;
-
-    @Autowired
     private TwitterTemplate twitterTemplate;
+    private CursoredList<T> iterator;
+    private long sleep;
 
 
-    public TwitterReader(CursoredList<T> iterator) {
+    public TwitterFollowersReader(CursoredList<T> iterator) {
+        this(iterator, 10000);
+    }
+
+    public TwitterFollowersReader(CursoredList<T> iterator, long sleep) {
         this.iterator = iterator;
+        this.sleep = sleep;
     }
 
     @Override
     public T read() throws UnexpectedInputException, ParseException, NonTransientResourceException, InterruptedException {
         if (iterator.isEmpty()) {
             log.info("Forced throttling... (10s)");
-            Thread.sleep(10000);
+            Thread.sleep(sleep);
             long nextCursor = iterator.getNextCursor();
             log.info("Fetching more data, cursor ID {}:", nextCursor);
-            if (nextCursor == 0){
+            if (nextCursor == 0) {
                 return null;
             }
             iterator = (CursoredList<T>) twitterTemplate.friendOperations().getFollowersInCursor(nextCursor);
