@@ -6,6 +6,9 @@ import org.springframework.batch.item.NonTransientResourceException;
 import org.springframework.batch.item.ParseException;
 import org.springframework.batch.item.UnexpectedInputException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
+import org.springframework.social.RateLimitExceededException;
 import org.springframework.social.twitter.api.CursoredList;
 import org.springframework.social.twitter.api.impl.TwitterTemplate;
 
@@ -19,7 +22,7 @@ public class TwitterFollowersReader<T> implements ItemReader<T> {
     private TwitterTemplate twitterTemplate;
 
     public TwitterFollowersReader(CursoredList<T> iterator) {
-        this(iterator, 20000);
+        this(iterator, 500);
     }
 
     public TwitterFollowersReader(CursoredList<T> iterator, long sleep) {

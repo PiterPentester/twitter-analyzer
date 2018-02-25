@@ -15,12 +15,19 @@ import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.support.IteratorItemReader;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.exception.ExceptionHandler;
+import org.springframework.beans.BeanInstantiationException;
+import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.retry.RetryPolicy;
 import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.EnableRetry;
 import org.springframework.retry.annotation.Retryable;
+import org.springframework.retry.backoff.BackOffPolicy;
+import org.springframework.retry.backoff.ExponentialBackOffPolicy;
+import org.springframework.retry.backoff.FixedBackOffPolicy;
+import org.springframework.retry.policy.AlwaysRetryPolicy;
 import org.springframework.retry.support.RetryTemplate;
 import org.springframework.social.RateLimitExceededException;
 import org.springframework.social.twitter.api.CursoredList;
@@ -64,13 +71,23 @@ public class BatchConfiguration {
     }
 
     @Bean
+    public BackOffPolicy backOffPolicy(){
+        FixedBackOffPolicy backOffPolicy = new FixedBackOffPolicy();
+        backOffPolicy.setBackOffPeriod(10_000);
+        return backOffPolicy;
+    }
+    @Bean
     public Step importTwitterFollowers() {
         return stepBuilderFactory.get("Importing Twitter Followers")
                 .<TwitterProfile, Profile>chunk(10_000)
-                .reader(this.twitterFollowersReader())
                 .faultTolerant()
-                .skip(RateLimitExceededException.class)
-                .skipLimit(100)
+                    .backOffPolicy(backOffPolicy())
+                    .retry(RateLimitExceededException.class)
+                    //.retry(BeanCreationException.class)
+                    //.retry(BeanInstantiationException.class)
+                    .retryLimit(1000)
+                    .noRollback(RateLimitExceededException.class)
+                .reader(this.twitterFollowersReader())
                 .processor(this.twitterProcessor())
                 .writer(this.twitterFollowersWriter())
                 .build();
@@ -98,7 +115,8 @@ public class BatchConfiguration {
         return jobBuilderFactory.get("twitter-job")
                 .incrementer(new RunIdIncrementer())
                 .start(this.importTwitterFollowers())
-                .next(importTwitterFriends()).build();
+                .next(importTwitterFriends())
+                .build();
 
     }
 
