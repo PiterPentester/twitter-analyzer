@@ -8,13 +8,21 @@ import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
+import org.springframework.batch.core.step.item.SimpleRetryExceptionHandler;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.support.IteratorItemReader;
+import org.springframework.batch.repeat.RepeatContext;
+import org.springframework.batch.repeat.exception.ExceptionHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.retry.RetryPolicy;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
+import org.springframework.retry.support.RetryTemplate;
+import org.springframework.social.RateLimitExceededException;
 import org.springframework.social.twitter.api.CursoredList;
 import org.springframework.social.twitter.api.TwitterProfile;
 import org.springframework.social.twitter.api.impl.TwitterTemplate;
@@ -60,6 +68,9 @@ public class BatchConfiguration {
         return stepBuilderFactory.get("Importing Twitter Followers")
                 .<TwitterProfile, Profile>chunk(10_000)
                 .reader(this.twitterFollowersReader())
+                .faultTolerant()
+                .skip(RateLimitExceededException.class)
+                .skipLimit(100)
                 .processor(this.twitterProcessor())
                 .writer(this.twitterFollowersWriter())
                 .build();
