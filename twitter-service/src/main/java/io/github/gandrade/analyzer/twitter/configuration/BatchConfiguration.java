@@ -1,5 +1,6 @@
 package io.github.gandrade.analyzer.twitter.configuration;
 
+import io.github.gandrade.analyzer.twitter.batch.TwitterFollowersWriter;
 import io.github.gandrade.analyzer.twitter.batch.TwitterProfileProcessor;
 import io.github.gandrade.analyzer.twitter.domain.Profile;
 import org.springframework.batch.core.Job;
@@ -9,6 +10,7 @@ import org.springframework.batch.core.configuration.annotation.StepBuilderFactor
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
+import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.support.IteratorItemReader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -16,6 +18,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.social.twitter.api.CursoredList;
 import org.springframework.social.twitter.api.TwitterProfile;
 import org.springframework.social.twitter.api.impl.TwitterTemplate;
+
+import java.util.List;
 
 @Configuration
 public class BatchConfiguration {
@@ -32,7 +36,7 @@ public class BatchConfiguration {
     }
 
     @Bean
-    public ItemProcessor twitterProcessor() {
+    public ItemProcessor<TwitterProfile, Profile> twitterProcessor() {
         return new TwitterProfileProcessor();
     }
 
@@ -47,11 +51,17 @@ public class BatchConfiguration {
     }
 
     @Bean
+    public ItemWriter<Profile> twitterFollowersWriter(){
+        return new TwitterFollowersWriter();
+    }
+
+    @Bean
     public Step importTwitterFollowers() {
         return stepBuilderFactory.get("Importing Twitter Followers")
                 .<TwitterProfile, Profile>chunk(10_000)
                 .reader(this.twitterFollowersReader())
                 .processor(this.twitterProcessor())
+                .writer(this.twitterFollowersWriter())
                 .build();
     }
 

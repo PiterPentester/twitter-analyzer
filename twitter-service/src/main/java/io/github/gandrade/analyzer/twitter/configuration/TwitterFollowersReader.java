@@ -19,10 +19,10 @@ public class TwitterFollowersReader<T> implements ItemReader<T> {
     private TwitterTemplate twitterTemplate;
 
     public TwitterFollowersReader(CursoredList<T> iterator) {
-        this(iterator, 10000);
+        this(iterator, 20000);
     }
 
-    public TwitterFollowersReader(CursoredList iterator, long sleep){
+    public TwitterFollowersReader(CursoredList<T> iterator, long sleep) {
         this.iterator = iterator;
         this.sleep = sleep;
     }
@@ -30,11 +30,10 @@ public class TwitterFollowersReader<T> implements ItemReader<T> {
     @Override
     public T read() throws UnexpectedInputException, ParseException, NonTransientResourceException, InterruptedException {
         if (iterator.isEmpty()) {
-            log.info("Forced throttling... (10s)");
             Thread.sleep(sleep);
             long nextCursor = iterator.getNextCursor();
             log.info("Fetching more data, cursor ID {}:", nextCursor);
-            if (nextCursor == 0){
+            if (nextCursor == 0) {
                 return null;
             }
             iterator = (CursoredList<T>) twitterTemplate.friendOperations().getFollowersInCursor(nextCursor);
