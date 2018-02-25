@@ -1,6 +1,5 @@
 buildscript {
 	ext {
-		// springBootVersion = '1.5.10.RELEASE'
 		springBootVersion = '2.0.0.RC1'
 		aptPluginVersion = '0.14'
 	}
@@ -71,6 +70,3 @@ dependencies {
 	testCompile("org.springframework.boot:spring-boot-starter-test")
 	testCompile("org.springframework.batch:spring-batch-test")
 }
-
-
-
