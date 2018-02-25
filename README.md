@@ -1,3 +1,3 @@
-[![Build Status][travis-image]][travis-url]
+[![Build Status](https://travis-ci.org/gandrade/twitter-analyzer.svg?branch=master)](https://travis-ci.org/gandrade/twitter-analyzer)
 
 # Twitter Profile Analyzer tool
