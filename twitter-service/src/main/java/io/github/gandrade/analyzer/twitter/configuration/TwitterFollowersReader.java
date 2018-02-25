@@ -22,9 +22,10 @@ public class TwitterFollowersReader<T> implements ItemReader<T> {
     private TwitterTemplate twitterTemplate;
 
     public TwitterFollowersReader(CursoredList<T> iterator) {
-        this(iterator, 500);
+        this(iterator, 500); //FIXME It must be removed when backoff policies being implemented.
     }
 
+    //FIXME It must be removed when backoff policies being implemented.
     public TwitterFollowersReader(CursoredList<T> iterator, long sleep) {
         this.iterator = iterator;
         this.sleep = sleep;
@@ -33,9 +34,9 @@ public class TwitterFollowersReader<T> implements ItemReader<T> {
     @Override
     public T read() throws UnexpectedInputException, ParseException, NonTransientResourceException, InterruptedException {
         if (iterator.isEmpty()) {
-            Thread.sleep(sleep);
+            Thread.sleep(sleep); //FIXME It must be removed when backoff policies being implemented.
             long nextCursor = iterator.getNextCursor();
-            log.info("Fetching more data, cursor ID {}:", nextCursor);
+            log.info("Fetching more Twitter data, cursor ID '{}':", nextCursor);
             if (nextCursor == 0) {
                 return null;
             }
