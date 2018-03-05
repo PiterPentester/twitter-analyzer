@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.neo4j.ogm.annotation.GraphId;
+import org.neo4j.ogm.annotation.Id;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
@@ -18,7 +19,7 @@ import static org.neo4j.ogm.annotation.Relationship.INCOMING;
 @NodeEntity
 public class Profile {
 
-    @GraphId
+    @Id
     private Long id;
     private Long twitterId;
     private String screenName;
