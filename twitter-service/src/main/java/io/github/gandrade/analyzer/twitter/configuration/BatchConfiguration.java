@@ -27,7 +27,9 @@ import org.springframework.retry.annotation.Retryable;
 import org.springframework.retry.backoff.BackOffPolicy;
 import org.springframework.retry.backoff.ExponentialBackOffPolicy;
 import org.springframework.retry.backoff.FixedBackOffPolicy;
+import org.springframework.retry.backoff.ThreadWaitSleeper;
 import org.springframework.retry.policy.AlwaysRetryPolicy;
+import org.springframework.retry.policy.SimpleRetryPolicy;
 import org.springframework.retry.support.RetryTemplate;
 import org.springframework.social.RateLimitExceededException;
 import org.springframework.social.twitter.api.CursoredList;
@@ -70,23 +72,26 @@ public class BatchConfiguration {
         return new TwitterFollowersWriter();
     }
 
+/*
     @Bean
-    public BackOffPolicy backOffPolicy(){
-        FixedBackOffPolicy backOffPolicy = new FixedBackOffPolicy();
-        backOffPolicy.setBackOffPeriod(10_000);
-        return backOffPolicy;
+    public RetryTemplate retryTemplate(){
+        RetryTemplate retryTemplate = new RetryTemplate();
+        FixedBackOffPolicy backOffPolicy = new FixedBackOffPolicy().withSleeper(new ThreadWaitSleeper());
+        backOffPolicy.setBackOffPeriod(10000l);
+        retryTemplate.setBackOffPolicy(backOffPolicy);
+        return retryTemplate;
     }
+*/
+
+
     @Bean
     public Step importTwitterFollowers() {
         return stepBuilderFactory.get("Importing Twitter Followers")
                 .<TwitterProfile, Profile>chunk(10_000)
                 .faultTolerant()
-                    .backOffPolicy(backOffPolicy())
-                    .retry(RateLimitExceededException.class)
-                    //.retry(BeanCreationException.class)
-                    //.retry(BeanInstantiationException.class)
-                    .retryLimit(1000)
-                    .noRollback(RateLimitExceededException.class)
+//                    .retry(RateLimitExceededException.class)
+//                    .retryLimit(5)
+//                    .noRollback(RateLimitExceededException.class)
                 .reader(this.twitterFollowersReader())
                 .processor(this.twitterProcessor())
                 .writer(this.twitterFollowersWriter())

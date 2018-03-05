@@ -32,11 +32,19 @@ public class TwitterFollowersReader<T> implements ItemReader<T> {
     }
 
     @Override
+    @Retryable(
+            value = RateLimitExceededException.class,
+            maxAttempts = 10,
+            //stateful = true,
+            backoff = @Backoff(
+                    value = 2000,
+                    multiplier = 2,
+                    maxDelay = 900000))
     public T read() throws UnexpectedInputException, ParseException, NonTransientResourceException, InterruptedException {
         if (iterator.isEmpty()) {
             Thread.sleep(sleep); //FIXME It must be removed when backoff policies being implemented.
             long nextCursor = iterator.getNextCursor();
-            log.info("Fetching more Twitter data, cursor ID '{}':", nextCursor);
+            log.info("Fetching more Twitter data, cursor ID '{}'", nextCursor);
             if (nextCursor == 0) {
                 return null;
             }
