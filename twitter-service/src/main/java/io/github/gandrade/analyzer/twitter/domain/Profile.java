@@ -3,10 +3,7 @@ package io.github.gandrade.analyzer.twitter.domain;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.neo4j.ogm.annotation.GraphId;
-import org.neo4j.ogm.annotation.Id;
-import org.neo4j.ogm.annotation.NodeEntity;
-import org.neo4j.ogm.annotation.Relationship;
+import org.neo4j.ogm.annotation.*;
 
 import java.util.Set;
 
@@ -20,8 +17,13 @@ import static org.neo4j.ogm.annotation.Relationship.INCOMING;
 public class Profile {
 
     @Id
+    @GeneratedValue
     private Long id;
+
+    @Index
     private Long twitterId;
+
+    @Index
     private String screenName;
     private String name;
     private String url;
