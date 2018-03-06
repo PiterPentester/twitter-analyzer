@@ -16,33 +16,24 @@ import org.springframework.social.twitter.api.impl.TwitterTemplate;
 public class TwitterFollowersReader<T> implements ItemReader<T> {
 
     private CursoredList<T> iterator;
-    private long sleep;
 
     @Autowired
     private TwitterTemplate twitterTemplate;
 
     public TwitterFollowersReader(CursoredList<T> iterator) {
-        this(iterator, 500); //FIXME It must be removed when backoff policies being implemented.
-    }
-
-    //FIXME It must be removed when backoff policies being implemented.
-    public TwitterFollowersReader(CursoredList<T> iterator, long sleep) {
         this.iterator = iterator;
-        this.sleep = sleep;
     }
 
     @Override
     @Retryable(
             value = RateLimitExceededException.class,
             maxAttempts = 10,
-            //stateful = true,
             backoff = @Backoff(
                     value = 2000,
                     multiplier = 2,
                     maxDelay = 900000))
     public T read() throws UnexpectedInputException, ParseException, NonTransientResourceException, InterruptedException {
         if (iterator.isEmpty()) {
-            Thread.sleep(sleep); //FIXME It must be removed when backoff policies being implemented.
             long nextCursor = iterator.getNextCursor();
             log.info("Fetching more Twitter data, cursor ID '{}'", nextCursor);
             if (nextCursor == 0) {
