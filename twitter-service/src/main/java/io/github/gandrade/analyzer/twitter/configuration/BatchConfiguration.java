@@ -72,26 +72,11 @@ public class BatchConfiguration {
         return new TwitterFollowersWriter();
     }
 
-/*
-    @Bean
-    public RetryTemplate retryTemplate(){
-        RetryTemplate retryTemplate = new RetryTemplate();
-        FixedBackOffPolicy backOffPolicy = new FixedBackOffPolicy().withSleeper(new ThreadWaitSleeper());
-        backOffPolicy.setBackOffPeriod(10000l);
-        retryTemplate.setBackOffPolicy(backOffPolicy);
-        return retryTemplate;
-    }
-*/
-
-
     @Bean
     public Step importTwitterFollowers() {
         return stepBuilderFactory.get("Importing Twitter Followers")
                 .<TwitterProfile, Profile>chunk(10_000)
                 .faultTolerant()
-//                    .retry(RateLimitExceededException.class)
-//                    .retryLimit(5)
-//                    .noRollback(RateLimitExceededException.class)
                 .reader(this.twitterFollowersReader())
                 .processor(this.twitterProcessor())
                 .writer(this.twitterFollowersWriter())
@@ -122,7 +107,6 @@ public class BatchConfiguration {
                 .start(this.importTwitterFollowers())
                 .next(importTwitterFriends())
                 .build();
-
     }
 
 }
