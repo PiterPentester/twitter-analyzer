@@ -8,6 +8,7 @@ import org.neo4j.ogm.annotation.*;
 import java.util.Set;
 
 import static org.neo4j.ogm.annotation.Relationship.INCOMING;
+import static org.neo4j.ogm.annotation.Relationship.OUTGOING;
 
 
 @Data
@@ -36,7 +37,7 @@ public class Profile {
     @Relationship(type = "FOLLOWERS", direction = INCOMING)
     private Set<Profile> followers;
 
-    @Relationship(type = "FOLLOWING")
+    @Relationship(type = "FOLLOWING", direction = OUTGOING)
     private Set<Profile> friends;
 
     private boolean followsMeBack;
