@@ -54,7 +54,8 @@ dependencies {
 	compile("org.neo4j:neo4j-ogm-bolt-driver:${neo4jOgmVersion}")
 
 	compile("org.springframework.boot:spring-boot-starter-batch")
-	runtime('mysql:mysql-connector-java') // Needs to have a database in place
+	// runtime('mysql:mysql-connector-java') // Needs to have a database in place
+	runtime('com.h2database:h2') // Needs to have a database in place
 
 	compile("org.springframework.boot:spring-boot-starter-integration")
 	compile("org.springframework.integration:spring-integration-twitter")
