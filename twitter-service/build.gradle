@@ -33,7 +33,7 @@ repositories {
 }
 
 ext {
-	mapStructVersion = '1.2.0.Final'
+	mapStructVersion = '1.3.0.Final'
 	neo4jOgmVersion = '3.0.0'
 }
 
